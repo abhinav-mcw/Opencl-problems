@@ -4,6 +4,8 @@
 #include "cl.hpp"
 #include "device_picker.hpp"
 #include "util.hpp"
+#include "util.h"
+
 
 #include <cstdio>
 #include <cstdlib>
@@ -13,8 +15,6 @@
 
 #include <fstream>
 #include <iostream>
-
-#include "util.h"
 
 #define TOL (0.001)
 #define ORDER 2
@@ -350,6 +350,60 @@ int main(int argc, char *argv[]) {
         }
       }
     }
+
+    program = cl::Program(context, util::loadProgram("./Softmax/softmax.cl"), true);
+
+    init4D_vector(N, h_a, h_b);
+
+    cl::make_kernel<int, cl::Buffer, cl::Buffer> softmaxFunc(program, "softmax");
+
+    {
+
+      start_time = static_cast<double>(timer.getTimeMilliseconds()) / 1000.0;
+
+      cl::NDRange global(N, N, N);
+
+      softmaxFunc(cl::EnqueueArgs(queue, global), N, d_a, d_b);
+
+      queue.finish();
+
+      run_time = (static_cast<double>(timer.getTimeMilliseconds()) / 1000.0) -
+                 start_time;
+
+      cl::copy(queue, d_b, h_b.begin(), h_b.end());
+
+      int correct = 0;
+      float tmp;
+      for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+          for (int k = 0; k < N; k++) {
+            long sumExp=0.0l;
+            int index = i * N * N * N + j * N * N + k * N;
+            for (int l = 0; l < N; l++) {
+              index = index + l;
+              sumExp+=(float)exp(h_a[index]);
+            }
+            index = i * N * N * N + j * N * N + k * N;
+            for (int l = 0; l < N; l++) {
+              float aval = h_a[index];
+              float bval = h_b[index];
+              float temp = exp(aval)/sumExp;
+              temp -= bval;
+
+              if (tmp * tmp <
+                  TOL * TOL) { // correct if square deviation is less
+                correct++;     //  than tolerance squared
+                printf("softmax of %.4f = %.4f   ", aval, bval);
+              } else {
+                printf(" tmp %f h_a %f h_b %f\n", tmp, aval, bval);
+              }
+            }
+            printf("\n");
+          }
+        }
+      }
+    }
+
 
   } catch (cl::Error err) {
     std::cout << "Exception\n";
