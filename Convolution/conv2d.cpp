@@ -50,7 +50,7 @@ int main() {
 
         // Build the program
         // program.build("-cl-std=CL1.2");
-        cl::Program program(context, util::loadProgram("./conv.cl"), true);
+        cl::Program program(context, util::loadProgram("./conv2d.cl"), true);
 
         // Create buffers
         cl::Buffer buffer_input(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * input.size(), input.data());
@@ -58,7 +58,7 @@ int main() {
         cl::Buffer buffer_output(context, CL_MEM_WRITE_ONLY, sizeof(float) * output.size());
 
         // Create the kernel and set arguments
-        cl::Kernel kernel(program, "conv");
+        cl::Kernel kernel(program, "conv2d");
         kernel.setArg(0, buffer_input);
         kernel.setArg(1, buffer_filter);
         kernel.setArg(2, buffer_output);

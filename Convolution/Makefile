@@ -19,9 +19,11 @@ ifeq ($(PLATFORM), Darwin)
 	LIBS = -framework OpenCL
 endif
 
-conv: conv.cpp
+conv2d: conv2d.cpp
 	$(CPPC) $^ $(INC1) $(CCFLAGS) $(LIBS) -o $@
 
+conv3d: conv3d.cpp
+	$(CPPC) $^ $(INC1) $(CCFLAGS) $(LIBS) -o $@
 
 clean:
-	rm -f conv
+	rm -f conv2d conv3d

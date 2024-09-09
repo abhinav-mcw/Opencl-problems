@@ -1,4 +1,4 @@
-__kernel void conv(__global float* input, __global float* filter, __global float* output, int N, int M, int L) {
+__kernel void conv2d(__global float* input, __global float* filter, __global float* output, int N, int M, int L) {
     int x = get_global_id(0);
     int y = get_global_id(1);
 

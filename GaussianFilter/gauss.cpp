@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 // Setup the buffers, initialize matrices, and write them into global memory
 //--------------------------------------------------------------------------------
 
-        //Load input image to the host and to the GPU
+        //Load input image to the host and to the CPU
         int width, height;
         cl::Image2D clImageInput;
         clImageInput = LoadImage(context, filename, width, height);
